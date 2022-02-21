@@ -76,7 +76,7 @@
                     event.preventDefault();
                     let form = new FormData(this);
                     $("#submit-btn").hide();
-                    $.("#loader").show();
+                    $("#loader").show();
                     //send register servlet
                     $.ajax({
                        url:"RegisterServlet",
@@ -85,7 +85,7 @@
                        success:function(data,textStatus,jqXHR){
                            console.log(data);
                            $("#submit-btn").show();
-                           $.("#loader").hide();
+                           $("#loader").hide();
                            if(data.trim()==='done'){
                                 swal("Registered Successfully")
                                 .then((value) => {
@@ -99,11 +99,11 @@
                        error:function(jqXHRm textStatus, errorThrown){
                            console.log(jqXHR);
                            $("#submit-btn").show();
-                           $.("#loader").hide();
+                           $("#loader").hide();
                            swal("Something went again..try again")
                        },
                        processData:false,
-                       cantentType:false
+                       contentType:false
                     });
                 });
             });
