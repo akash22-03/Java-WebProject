@@ -1,3 +1,7 @@
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.tech.blog.entities.Category"%>
+<%@page import="com.tech.blog.dao.PostDao"%>
+<%@page import="com.tech.blog.helper.ConnectionProvider"%>
 <%@page import="com.tech.blog.entities.Message"%>
 <%@page import="com.tech.blog.entities.User"%>
 <%@page errorPage="error_page.jsp" %>
@@ -20,6 +24,12 @@
             .banner{
                 clip-path: polygon(50% 0%, 100% 0, 100% 89%, 75% 100%, 40% 84%, 0 100%, 0 0); 
                 /*Designed using bennettfeely.com/clippy/ */
+            }
+            body{
+                background: url(img/bg.jpg);
+                background-size: cover;
+                background-attachment: fixed;
+                
             }
         </style>
     </head>
@@ -50,6 +60,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="#"><span class="fa fa-address-card-o"></span> Contact</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-toggle="modal" data-target="#add-post-modal"><span class="fa fa-asterisk"></span> Post</a>
+            </li>
             
           </ul>
             <ul class="navbar-nav mr-right">
@@ -76,6 +89,46 @@
                     }
                 %>
                 
+                <!-- Main Body of the Page -->
+                
+                <main>
+                    <div class="container">
+                        <div class="row mt-4">
+                            <!-- Col 1 -->
+                            <div class="col-md-4">
+                                <!-- Categories -->
+                                <div class="list-group">
+                                    <a href="#" onClick="getPosts(0,this)" class="c-link list-group-item list-group-item-action active">
+                                      All Posts
+                                    </a>
+                                    <% 
+                                        PostDao d = new PostDao(ConnectionProvider.getConnection());
+                                        ArrayList<Category> list1 = d.getAllCategories();
+                                        for(Category cc:list1){
+                                            %>
+                                            <a href="#" onClick="getPosts(<%= cc.getCid() %>,this)" class="c-link list-group-item list-group-item-action"><%= cc.getName() %></a>
+                                            <%
+                                        }
+                                    %>
+                                    
+                                </div>
+                            </div>
+                            <!-- Col 2 -->
+                            <div class="col-md-8">
+                                <!-- Posts -->
+                                <div class="container text-center" id="loader">
+                                    <i class="fa fa-refresh fa-4x fa-spin"></i>
+                                    <h3 class="mt-2">Loading...</h3>
+                                </div>
+                                <div class="container-fluid" id="post-container">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                
+                <!-- End of Main Body -->
         <!-- start of profile modal -->
             <div class="modal fade" id="profile-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
@@ -123,19 +176,19 @@
                                   <!--enctype="multipart/form-data" for image/audio/video -->
                                   <table class="table">
                                       <tr>
-                                        <th scope="row">ID :</th>
+                                        <td>ID :</td>
                                         <td><%=user.getId() %></td>
                                       </tr>
                                       <tr>
-                                        <th scope="row">Email :</th>
-                                        <td><%=user.getEmail() %></td>
+                                        <td>Email :</td>
+                                        <td><input type="email" class="form-control" name ="user_email" value=" <%=user.getEmail() %>"></td>
                                       </tr>
                                       <tr>
-                                        <th scope="row">Name :</th>
+                                        <td>Name :</td>
                                         <td><input type="text" class="form-control" name="user_name" value="<%= user.getName() %>"></td>
                                       </tr>
                                       <tr>
-                                        <th scope="row">Password:</th>
+                                        <td>Password:</td>
                                         <td><input type="password" class="form-control" name="user_password" value="<%= user.getPassword() %>"></td>
                                       </tr>
                                       <tr>
@@ -144,9 +197,7 @@
                                       </tr>
                                       <tr>
                                         <th>About :</th>
-                                        <td><textarea rows="3" class="form-control" name="user_about">
-                                            <%= user.getAbout()%>
-                                            </textarea></td>
+                                        <td><textarea rows="3" class="form-control" name="user_about"><%= user.getAbout()%></textarea></td>
                                         </tr>
                                         <tr>
                                         <th scope="row">Profile Pic :</th>
@@ -168,9 +219,62 @@
               </div>
             </div>
         <!-- end of profile modal -->
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        
+        <!-- start of post modal -->
+            <div class="modal fade" id="add-post-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Post Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                      <form id="add-post-form" action ="AddPostServlet" method="POST">
+                          <div class="form-group">
+                              <select class="form-control" name="cid">
+                                    <option selected disabled>---Select Category---</option>
+                                    <% 
+                                        PostDao postd = new PostDao(ConnectionProvider.getConnection());
+                                        ArrayList<Category> list = postd.getAllCategories();
+                                        for(Category c : list){
+                                        %>
+                                        <option value="<%= c.getCid() %>"><%= c.getName() %></option>
+                                        <%
+                                        }
+                                    %>
+                                </select>
+                          </div>
+                          <div class="form-group">
+                              <input type="text" name="pTitle" class="form-control" placeholder="Enter Post Title" />
+                               
+                          </div>
+                          <div class="form-group">
+                              <textarea class="form-control" name="pContent" style="height:200px;" placeholder="Enter your content  "></textarea>
+                          </div>
+                          <div class="form-group">
+                              <textarea class="form-control" name="pCode" style="height:200px;" placeholder="Enter your program(if any)  "></textarea>
+                          </div>
+                          <div class="form-group">
+                              <label>Select your picture</label><br>
+                              <input type="file" name="pic"/>
+                          </div>
+                            <div class="container text-center">
+                                <button type="submit" class="btn btn-outline-primary">Post</button>
+                            </div>
+                      </form>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+                                
+        <!-- end of post modal -->
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script>
             $(document).ready(function(){
                 let editStatus = false;
@@ -189,7 +293,64 @@
                 });
             });
         </script>
-    
+        <!-- Post JS -->
+        <script>
+            $(document).ready(function(e){
+                $("#add-post-form").on("submit", function(event){
+                    //invoked when form is submitted
+                    event.preventDefault();
+                    console.log("Submitted");
+                    let form = new FormData(this);
+                    //now requesting to server
+                    $.ajax({
+                        url: "AddPostServlet",
+                        type:'POST',
+                        data: form,
+                        success: function(data,textStatus, jqXHR){
+                            //success
+                            console.log(data);
+                            if(data.trim() == 'done'){
+                                swal("Good job!", "Saved Successfully!", "success");
+                            }else{
+                                swal("Error!", "Something went wrong try again..", "error");
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown){
+                            //error
+                            swal("Error!", "Something went wrong try again..", "error");
+                        },
+                        processData: false,
+                        contentType: false
+                    })
+                });
+            });
+            
+        </script>
+        <!--loading post using ajax, dusre jsp re load hoke mere current page pe show karde-->
+        <script>
+            
+            function getPosts(catId, temp){
+                $("#loader").show();
+                $("#post-container").hide();
+                $(".c-link").removeClass('active');
+                
+                $.ajax({
+                    url:"load_posts.jsp",
+                    data: {cid:catId},
+                    success: function (data, textStatus, jqXHR) {
+                        $("#loader").hide();
+                        $("#post-container").show();
+                        $("#post-container").html(data);
+                        $(temp).addClass('active');
+                    }
+                })
+            }
+            
+            $(document).ready(function(){
+                let allPostRef = $('.c-link')[0];
+                getPosts(0,allPostRef);
+            })
+        </script>
     
     </body>
 </html>

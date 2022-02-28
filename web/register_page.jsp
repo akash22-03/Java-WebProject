@@ -15,7 +15,7 @@
         </style>
     </head>
     <body>
-        <%@include file="normal_navbar.jsp" %>
+    <%@include file="normal_navbar.jsp" %>
     <main class="primary-background" style="padding-bottom:80px">
         <div class="container">
             <div class="col-md-6 offset-md-3">
@@ -66,12 +66,13 @@
     </main>
         <!-- javascripts -->
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-        <script src="js/myjs.js" type="text/javascript"></script>
         <script>   
             $(document).ready(function(){
+                console.log("ready....");
                 $('#reg-form').on('submit',function(event){
                     event.preventDefault();
                     let form = new FormData(this);
@@ -96,7 +97,7 @@
                            }
                            
                        },
-                       error:function(jqXHRm textStatus, errorThrown){
+                       error:function(jqXHRm ,textStatus, errorThrown){
                            console.log(jqXHR);
                            $("#submit-btn").show();
                            $("#loader").hide();
